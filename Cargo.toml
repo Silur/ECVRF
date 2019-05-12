@@ -1,8 +1,12 @@
 [package]
 name = "ecvrf"
-version = "0.1.0"
+version = "0.1.1"
 authors = ["Silur <abrahamendre9@gmail.com>"]
 edition = "2018"
+repository = "https://github.com/Silur/ECVRF.git"
+license = "GPL-3.0-or-later"
+description = "A curve25519+SHA3 verifiable random function"
+readme = "README.md"
 
 [dependencies]
 rand = "0.6.5"
