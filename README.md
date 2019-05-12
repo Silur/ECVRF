@@ -6,6 +6,12 @@ See more in Micali's groundbreaking publication: https://people.csail.mit.edu/si
 
 This elliptic curve instantiation was originally subject to exhaustive research in order to improve DNSSEC and proven to have the Trusted Uniqueness and Selective Pseudorandomness properties: https://eprint.iacr.org/2014/905.pdf
 
+## How is this different from traditional signatures?
+An even more naive explanation of VRFs is that they are HMACs where the key is assymetric.
+The parties agree on a pseudorandom function (SHA3) and exchange a proof with the same pseudorandomness that binds to the input but doesn't serve as the __only__ witness (which is the case with simple SHA).
+
+![comparison table](http://cryptowiki.net/images/d/dc/Tabtabi4e.png)
+
 ## Usage
 
 ```rust
