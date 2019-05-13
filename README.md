@@ -16,11 +16,11 @@ The parties agree on a pseudorandom function (SHA3) and exchange a proof with th
 
 ```rust
     extern crate rand_os;
+	extern crate ec_vrf;
     use curve25519_dalek::scalar::{Scalar};
     use curve25519_dalek::constants::ED25519_BASEPOINT_POINT as g;
     use curve25519_dalek::constants::RISTRETTO_BASEPOINT_POINT as rg;
     use rand_os::OsRng;
-    use ec_vrf::{prove, verify};
 
    
     fn main() {
