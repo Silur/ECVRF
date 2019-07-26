@@ -191,8 +191,8 @@ mod tests {
         let privkey: Scalar = Scalar::random(&mut csprng);
         let pubkey = g * privkey;
         let input = vec![1, 2, 3, 4, 5, 6, 7, 8];
-        let (output, proof) = ec_vrf::curve25519::prove(&input, privkey);
-        assert!(ec_vrf::curve25519::verify(&input, pubkey, output, proof));
+        let (output, proof) = curve25519::prove(&input, privkey);
+        assert!(curve25519::verify(&input, pubkey, output, proof));
     }
 
     #[test]
@@ -201,7 +201,7 @@ mod tests {
         let privkey: Scalar = Scalar::random(&mut csprng);
         let pubkey = rg * privkey;
         let input = vec![1, 2, 3, 4, 5, 6, 7, 8];
-        let (output, proof) = ec_vrf::ristretto::prove(&input, &privkey);
-        assert!(ec_vrf::ristretto::verify(&input, pubkey, output, proof));
+        let (output, proof) = ristretto::prove(&input, &privkey);
+        assert!(ristretto::verify(&input, pubkey, output, proof));
     }
 }
