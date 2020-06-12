@@ -154,7 +154,7 @@ pub mod ristretto {
         (beta, VrfProof { gamma, c, s })
     }
 
-    pub fn verify(input: &[u8], pubkey: EcPoint, output: [u8; 32], proof: VrfProof) -> bool {
+    pub fn verify(input: &[u8], pubkey: &EcPoint, output: &[u8; 32], proof: &VrfProof) -> bool {
         let c_scalar = Scalar::from_bytes_mod_order(proof.c);
         let u = pubkey * c_scalar + g * proof.s;
         let h = hash_to_point(input.to_vec());
@@ -163,7 +163,7 @@ pub mod ristretto {
         let mut hasher = SHA3::default();
         hasher.input(serialize_point(g));
         hasher.input(serialize_point(h));
-        hasher.input(serialize_point(pubkey));
+        hasher.input(serialize_point(*pubkey));
         hasher.input(serialize_point(proof.gamma));
         hasher.input(serialize_point(u));
         hasher.input(serialize_point(v));
@@ -172,7 +172,7 @@ pub mod ristretto {
         for i in 0..hres.len() {
             local_c[i] = hres[i];
         }
-        sha3(serialize_point(proof.gamma).to_vec()) == output && local_c == proof.c
+        sha3(serialize_point(proof.gamma).to_vec()) == *output && local_c == proof.c
     }
 }
 
@@ -206,6 +206,6 @@ mod tests {
         let pubkey = rg * privkey;
         let input = vec![1, 2, 3, 4, 5, 6, 7, 8];
         let (output, proof) = ristretto::prove(&input, &privkey);
-        assert!(ristretto::verify(&input, pubkey, output, proof));
+        assert!(ristretto::verify(&input, &pubkey, &output, &proof));
     }
 }
