@@ -34,7 +34,7 @@ pub mod curve25519 {
     fn serialize_point(p: EcPoint) -> [u8; 32] {
         p.to_montgomery().to_bytes()
     }
-    pub fn prove(input: &[u8], privkey: Scalar) -> ([u8; 32], VrfProof) {
+    pub fn prove(input: &[u8], privkey: &Scalar) -> ([u8; 32], VrfProof) {
         let h = hash_to_point(input.to_vec());
         let gamma = h * privkey;
         let mut csprng: OsRng = OsRng::new().unwrap();
@@ -57,7 +57,7 @@ pub mod curve25519 {
         (beta, VrfProof { gamma, c, s })
     }
 
-    pub fn verify(input: &[u8], pubkey: EcPoint, output: [u8; 32], proof: VrfProof) -> bool {
+    pub fn verify(input: &[u8], pubkey: &EcPoint, output: &[u8; 32], proof: &VrfProof) -> bool {
         let c_scalar = Scalar::from_bytes_mod_order(proof.c);
         let u = pubkey * c_scalar + g * proof.s;
         let h = hash_to_point(input.to_vec());
@@ -66,7 +66,7 @@ pub mod curve25519 {
         let mut hasher = SHA3::default();
         hasher.input(serialize_point(g));
         hasher.input(serialize_point(h));
-        hasher.input(serialize_point(pubkey));
+        hasher.input(serialize_point(*pubkey));
         hasher.input(serialize_point(proof.gamma));
         hasher.input(serialize_point(u));
         hasher.input(serialize_point(v));
@@ -75,7 +75,7 @@ pub mod curve25519 {
         for i in 0..hres.len() {
             local_c[i] = hres[i];
         }
-        sha3(serialize_point(proof.gamma).to_vec()) == output && local_c == proof.c
+        sha3(serialize_point(proof.gamma).to_vec()) == *output && local_c == proof.c
     }
 }
 pub mod ristretto {
@@ -180,6 +180,7 @@ pub mod ristretto {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use super::*;
     use curve25519_dalek::constants::ED25519_BASEPOINT_POINT as g;
     use curve25519_dalek::constants::RISTRETTO_BASEPOINT_POINT as rg;
     use curve25519_dalek::scalar::Scalar;
@@ -191,10 +192,13 @@ mod tests {
         let privkey: Scalar = Scalar::random(&mut csprng);
         let pubkey = g * privkey;
         let input = vec![1, 2, 3, 4, 5, 6, 7, 8];
-        let (output, proof) = curve25519::prove(&input, privkey);
-        assert!(curve25519::verify(&input, pubkey, output, proof));
+        let (output, proof) = curve25519::prove(&input, &privkey);
+        assert!(curve25519::verify(&input, &pubkey, &output, &proof));
     }
-
+ /*   #[bench]
+    fn bench_curve25519(b: &mut Bencher) {
+        b.iter(|| curve25519());
+    } */
     #[test]
     fn ristretto() {
         let mut csprng: OsRng = OsRng::new().unwrap();
