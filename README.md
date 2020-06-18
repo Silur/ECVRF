@@ -22,8 +22,6 @@ fn main() {
 	let (output, proof) = ecvrf::prove(&input, privkey);
 	assert!(ecvrf::verify(&input, &pubkey, output, proof));
 }
-}
-
 ```
 
 You can serialize/deserialize each type with the corresponding `to_bytes` and `from_bytes` functions
