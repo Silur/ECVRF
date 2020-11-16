@@ -49,6 +49,12 @@ impl VrfSk {
     }
 }
 
+impl Clone for VrfSk {
+    fn clone(&self) -> Self {
+        VrfSk { s: self.s }
+    }
+}
+
 impl VrfPk {
     pub fn new(sk: &VrfSk) -> VrfPk {
         return VrfPk { p: g*sk.s };
@@ -60,6 +66,12 @@ impl VrfPk {
         let p = CompressedRistretto::from_slice(b).decompress();
         if p.is_none() { return Err("public key is not canonical"); }
         return Ok(VrfPk{ p: p.unwrap() });
+    }
+}
+
+impl Clone for VrfPk {
+    fn clone(&self) -> Self {
+        VrfPk { p: self.p }
     }
 }
 
@@ -91,6 +103,16 @@ impl VrfProof {
             c: c,
             s: s_reduced.unwrap()
         });
+    }
+}
+
+impl Clone for VrfProof {
+    fn clone(&self) -> Self {
+        VrfProof {
+            gamma: self.gamma,
+            c: self.c,
+            s: self.s,
+         }
     }
 }
 
