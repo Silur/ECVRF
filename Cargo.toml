@@ -1,6 +1,6 @@
 [package]
 name = "ecvrf"
-version = "0.4.1"
+version = "0.4.2"
 authors = ["Silur <abrahamendre9@gmail.com>"]
 edition = "2018"
 repository = "https://github.com/Silur/ECVRF.git"
