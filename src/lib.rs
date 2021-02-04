@@ -1,13 +1,13 @@
 use rand_core::{OsRng};
-use sha3::{Digest, Sha3_256 as SHA3};
+use sha3::{Digest, Sha3_256 as SHA3, Sha3_512};
 use curve25519_dalek::scalar::Scalar;
 use curve25519_dalek::constants::RISTRETTO_BASEPOINT_POINT as g;
 use curve25519_dalek::ristretto::{RistrettoPoint, CompressedRistretto};
 
 fn sha3(b: Vec<u8>) -> [u8; 32] {
     let mut hasher = SHA3::default();
-    hasher.input(b);
-    let r = hasher.result();
+    hasher.update(b);
+    let r = hasher.finalize();
     let mut ret = [0 as u8; 32];
     for i in 0..r.len() {
         ret[i] = r[i];
@@ -116,11 +116,6 @@ impl Clone for VrfProof {
     }
 }
 
-fn hash_to_point(b: Vec<u8>) -> RistrettoPoint {
-    let hash = sha3(b);
-    let s = Scalar::from_bytes_mod_order(hash);
-    g * s
-}
 fn serialize_point(p: RistrettoPoint) -> [u8; 32] {
     p.compress().to_bytes()
 }
@@ -135,18 +130,18 @@ pub fn keygen() -> (VrfSk, VrfPk) {
 /// The output of a VRF function is the VRF hash and the proof to verify
 /// we generated this hash with the supplied key
 pub fn prove(input: &[u8], privkey: &VrfSk) -> ([u8; 32], VrfProof) {
-    let h = hash_to_point(input.to_vec());
+    let h = RistrettoPoint::hash_from_bytes::<Sha3_512>(input);
     let gamma = h * privkey.s;
     let k: Scalar = Scalar::random(&mut OsRng);
     let mut hasher = SHA3::default();
-    hasher.input(serialize_point(g));
-    hasher.input(serialize_point(h));
-    hasher.input(serialize_point(g * privkey.s));
-    hasher.input(serialize_point(h * privkey.s));
-    hasher.input(serialize_point(g * k));
-    hasher.input(serialize_point(h * k));
+    hasher.update(serialize_point(g));
+    hasher.update(serialize_point(h));
+    hasher.update(serialize_point(g * privkey.s));
+    hasher.update(serialize_point(h * privkey.s));
+    hasher.update(serialize_point(g * k));
+    hasher.update(serialize_point(h * k));
     let mut c = [0 as u8; 32];
-    let hres = hasher.result();
+    let hres = hasher.finalize();
     for i in 0..hres.len() {
         c[i] = hres[i];
     }
@@ -159,18 +154,18 @@ pub fn prove(input: &[u8], privkey: &VrfSk) -> ([u8; 32], VrfProof) {
 pub fn verify(input: &[u8], pubkey: &VrfPk, output: &[u8; 32], proof: &VrfProof) -> bool {
     let c_scalar = Scalar::from_bytes_mod_order(proof.c);
     let u = pubkey.p * c_scalar + g * proof.s;
-    let h = hash_to_point(input.to_vec());
+    let h = RistrettoPoint::hash_from_bytes::<Sha3_512>(input);
     let v = proof.gamma * c_scalar + h * proof.s;
 
     let mut hasher = SHA3::default();
-    hasher.input(serialize_point(g));
-    hasher.input(serialize_point(h));
-    hasher.input(serialize_point(pubkey.p));
-    hasher.input(serialize_point(proof.gamma));
-    hasher.input(serialize_point(u));
-    hasher.input(serialize_point(v));
+    hasher.update(serialize_point(g));
+    hasher.update(serialize_point(h));
+    hasher.update(serialize_point(pubkey.p));
+    hasher.update(serialize_point(proof.gamma));
+    hasher.update(serialize_point(u));
+    hasher.update(serialize_point(v));
     let mut local_c = [0 as u8; 32];
-    let hres = hasher.result();
+    let hres = hasher.finalize();
     for i in 0..hres.len() {
         local_c[i] = hres[i];
     }
