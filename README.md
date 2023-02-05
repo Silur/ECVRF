@@ -17,8 +17,8 @@ The parties agree on a pseudorandom function (SHA3) and exchange a proof with th
 ```rust
 use ecvrf::{VrfSk, VrfPk, VrfProof, keygen, prove, verify};
 fn main() {
-	let (privkey, pubkey): VrfSk = keygen()
-						   let input = vec![0xde, 0xad, 0xbe, 0xef];
+	let (privkey, pubkey): VrfSk = keygen();
+	let input = vec![0xde, 0xad, 0xbe, 0xef];
 	let (output, proof) = ecvrf::prove(&input, privkey);
 	assert!(ecvrf::verify(&input, &pubkey, output, proof));
 }
