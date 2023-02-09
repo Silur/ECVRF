@@ -9,7 +9,7 @@ description = "A curve25519+SHA3 verifiable random function"
 readme = "README.md"
 
 [dependencies]
-rand = "0.7.3"
+rand = "0.8.5"
 rand_core = "0.5.1"
 sha3 = "0.9.1"
 curve25519-dalek = "3.2.1"
