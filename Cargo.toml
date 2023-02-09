@@ -1,6 +1,6 @@
 [package]
 name = "ecvrf"
-version = "0.4.3"
+version = "0.4.4"
 authors = ["Silur <abrahamendre9@gmail.com>"]
 edition = "2018"
 repository = "https://github.com/Silur/ECVRF.git"
@@ -12,4 +12,4 @@ readme = "README.md"
 rand = "0.7.3"
 rand_core = "0.5.1"
 sha3 = "0.9.1"
-curve25519-dalek = "3.1.0"
+curve25519-dalek = "3.2.1"
